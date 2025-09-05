@@ -11,30 +11,71 @@ This project focuses on detecting abnormal energy consumption patterns in commer
 
 ---
 
-## 2. Dataset
-- Source: **ASHRAE Great Energy Predictor Competition (2016)**  
-- Original data: 400 commercial buildings  
+## 2. Processed Data & Files
+
+- **Source:** ASHRAE Great Energy Predictor Competition (2016)  
+- **Original data:** 400 commercial buildings  
 - **Processed training data:** 201 buildings (~1.75M records)  
-- Target variable: `anomaly` (0 = normal, 1 = abnormal)  
-- Features: Label encoding applied for categorical data  
-- Class distribution in processed training set:  
-  - Abnormal (1): 37,296 (~2%)  
-  - Normal (0): 1,712,198  
+
+The **processed dataset `train_meta_label.csv`** is the result of merging raw data `train.csv` with `building_metadata.csv` and applying preprocessing steps to make it ready for model training.
+
+### Files
+
+**train.csv** – Original training dataset for 201 buildings.
+
+- `building_id` – Unique building ID.  
+- `timestamp` – When the measurement was taken.  
+- `meter_reading` – Electricity consumption in kWh.  
+- `anomaly` – Whether this reading is anomalous (1) or not (0).  
+
+**building_meta.csv** – Metadata for 400+ buildings.
+
+- `building_id` – Unique building ID.  
+- `primary_use` – Primary use of the building (e.g., Office, Education).  
+- `year_built` – Year the building was constructed.  
+- `floor_count` – Number of floors.  
+
+**train_meta_label.csv** – Processed training dataset ready for modeling.  
+
+- Result of merging `train.csv` and `building_meta.csv` with **label encoding**.  
+- Includes additional preprocessing steps such as:  
+  - Handling missing values (`meter_reading_missing`, `year_built_missing`, `floor_count_missing`)  
+  - Extraction of temporal features from `timestamp` (`hour`, `day`, `month`, `weekend_flag`)  
+
+- Columns: `building_id`, `timestamp`, `meter_reading`, `square_feet`, `year_built`, `floor_count`, `primary_use_label`, `anomaly`, `meter_reading_missing`, `year_built_missing`, `floor_count_missing`  
+
+**train_meta_one-hot.csv** – Same as above, but with **one-hot encoding** for `primary_use`. **Not yet used for training**.  
+
+**merge.py** – Script used to merge `building_meta.csv` with `train.csv` to produce `train_meta_label.csv` and `train_meta_one-hot.csv`.  
+
+**lead_train.ipynb** – Training and evaluation pipeline for anomaly detection.
+- Input: `train_meta_label.csv`  
+- Features: timestamp-derived features, metadata  
+- Models: Logistic Regression, XGBoost, DNN  
+- Outputs: trained models, evaluation metrics, loss/ROC plots
 
 ---
 
 ## 3. Data Preprocessing
-Key steps performed before modeling:
-1. **Handling missing values**:
+
+The preprocessing steps applied to generate `train_meta_label.csv` include:
+
+3.1. **Handling missing values**:
    - `meter_reading`: NaN → 0, add `meter_reading_missing` flag  
    - `year_built`: NaN → median(year_built), add `year_built_missing` flag  
-   - `floor_count`: NaN → 1, add `floor_count_missing` flag
-2. **Feature extraction** from timestamps:
-   - `hour`, `day`, `month`, `weekend_flag` (1 if weekend)  
-3. **Standardization**: All numeric features scaled using `StandardScaler`  
-4. **Handling class imbalance**: Weighted loss applied to improve model learning for rare anomaly class  
+   - `floor_count`: NaN → 1, add `floor_count_missing` flag  
+
+3.2. **Feature extraction from timestamp**:
+   - Derived features: `hour`, `day`, `month`, `weekend_flag` (1 if weekend)  
+
+3.3. **Standardization**:
+   - All numeric features scaled using `StandardScaler`  
+
+3.4. **Handling class imbalance**:
+   - Weighted loss applied during model training to improve learning on rare anomaly class  
 
 ---
+
 
 ## 4. Modeling
 Three models were implemented:
@@ -105,4 +146,6 @@ XGBoost is the most effective model, achieving high precision, recall, and F1-sc
 DNN performs better than Logistic Regression but not as well as XGBoost. Its ROC curve is higher than Logistic Regression, demonstrating better class separation, but overall performance is moderate (AUC ~0.82).
 
 Overall, considering the validation set results, XGBoost is the best-performing model, offering a good balance between precision and recall, suitable for tasks requiring accurate classification and anomaly detection.
+
+
 
