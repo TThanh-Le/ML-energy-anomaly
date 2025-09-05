@@ -42,16 +42,12 @@ The **processed dataset `train_meta_label.csv`** is the result of merging raw da
   - Handling missing values (`meter_reading_missing`, `year_built_missing`, `floor_count_missing`)  
   - Extraction of temporal features from `timestamp` (`hour`, `day`, `month`, `weekend_flag`)  
 
-- Columns: `building_id`, `timestamp`, `meter_reading`, `square_feet`, `year_built`, `floor_count`, `primary_use_label`, `anomaly`, `meter_reading_missing`, `year_built_missing`, `floor_count_missing`  
-
 **train_meta_one-hot.csv** – Same as above, but with **one-hot encoding** for `primary_use`. **Not yet used for training**.  
 
 **merge.py** – Script used to merge `building_meta.csv` with `train.csv` to produce `train_meta_label.csv` and `train_meta_one-hot.csv`.  
 
 **lead_train.ipynb** – Training and evaluation pipeline for anomaly detection.
 - Input: `train_meta_label.csv`  
-- Features: timestamp-derived features, metadata  
-- Models: Logistic Regression, XGBoost, DNN  
 - Outputs: trained models, evaluation metrics, loss/ROC plots
 
 ---
@@ -60,51 +56,70 @@ The **processed dataset `train_meta_label.csv`** is the result of merging raw da
 
 The preprocessing steps applied to generate `train_meta_label.csv` include:
 
-3.1. **Handling missing values**:
+**Handling missing values**:
    - `meter_reading`: NaN → 0, add `meter_reading_missing` flag  
    - `year_built`: NaN → median(year_built), add `year_built_missing` flag  
    - `floor_count`: NaN → 1, add `floor_count_missing` flag  
 
-3.2. **Feature extraction from timestamp**:
-   - Derived features: `hour`, `day`, `month`, `weekend_flag` (1 if weekend)  
+**Feature extraction from timestamp**- Derived features: `hour`, `day`, `month`, `weekend_flag` (1 if weekend)
+     
+**Standardization** - All numeric features scaled using `StandardScaler`  
 
-3.3. **Standardization**:
-   - All numeric features scaled using `StandardScaler`  
-
-3.4. **Handling class imbalance**:
-   - Weighted loss applied during model training to improve learning on rare anomaly class  
+**Handling class imbalance** - Weighted loss applied during model training to improve learning on rare anomaly class  
 
 ---
 
 
 ## 4. Modeling
-Three models were implemented:
+The dataset is split into three subsets: training set (70%), validation set (27%) and test set (3%), ensuring that the ratio of anomalous vs. normal samples is preserved in each split. All numerical features are standardized using StandardScaler to improve model convergence and stability.
 
+I implemented three complementary models to detect anomalies in building energy consumption:
+
+4.1. Logistic Regression
 ### 4.1 Logistic Regression
-- Iterations: 1000  
-- Learning rate: 0.01  
-- Optimization: Gradient Descent  
 
-### 4.2 XGBoost (Best Model)
-- Max depth: 3  
-- Learning rate: 0.3  
-- Number of estimators: 300  
-- Scale_pos_weight: 20 (handle class imbalance)  
-- Gamma: 0.2  
-- Min_child_weight: 0  
+Key characteristics:
+- Outputs a probability between 0 and 1, which can be thresholded to assign class labels (0 or 1).  
+- Provides **interpretable coefficients**, allowing insight into how each feature contributes to the prediction.  
+- Serves as a strong **baseline model** for anomaly detection, especially when combined with feature engineering.  
 
-### 4.3 Dense Neural Network (DNN)
-- Architecture: 3 hidden layers  
-- Optimizer: Adam (lr=0.0004)  
-- Loss: Binary cross-entropy  
-- Regularization: L2 + Dropout (0.5)  
-- Early stopping: patience=10 epochs  
-- Batch size: 64  
+**Advantages in this project:**
+- Fast to train and easy to interpret.  
+- Provides a transparent benchmark for evaluating more complex models (XGBoost, DNN).  
+- Works effectively when anomalies are rare and features are properly scaled.  
 
----
+> This model serves as a baseline for anomaly detection, leveraging the sigmoid function to map feature combinations into probabilistic predictions.
+
+
+4.2. XGBoost Classifier
+
+Key characteristics:
+- Builds an ensemble of **decision trees**, where each new tree corrects the errors of previous ones.
+- Optimizes a **regularized objective function** to prevent overfitting.
+- Handles **class imbalance** via parameters like `scale_pos_weight`.
+
+**Advantages in this project:**
+- High accuracy for detecting anomalies in energy consumption data.
+- Robust to outliers and irrelevant features.
+- Capable of capturing complex, non-linear relationships between building metadata and electricity usage patterns.
+
+> XGBoost serves as the **best-performing model** in this project, effectively detecting anomalies in building energy consumption by leveraging an ensemble of boosted decision trees.
+
+4.3. Dense Neural Network (DNN)
+
+Multi-layer feedforward network capturing complex feature interactions.
+
+Architecture: 5 hidden layers with Dropout and L2 regularization.
+
+Early stopping: 10 epochs patience
+
+<img width="916" height="184" alt="image" src="https://github.com/user-attachments/assets/e2b76fac-adfc-47a1-966f-887f503ce5f4" />
+
+**Figure 4.1: Network architecture used in the DNN model for anomaly detection**
+
 
 ## 5. Evaluation & Results
-Table 1: Comparison of AUC scores for different models on the validation set.
+Table 5.1: Comparison of AUC scores for different models on the validation set.
 
 | Model             | AUC    |
 |------------------|-------|
@@ -112,7 +127,7 @@ Table 1: Comparison of AUC scores for different models on the validation set.
 | XGBoost           | 0.9921 |
 | DNN               | 0.7135 |
 
-Table 2: Precision, Recall, and F1-score for validation and test sets across models.
+Table 5.2: Precision, Recall, and F1-score for validation and test sets across models.
 | Model               | Precision (Val) | Precision (Test) | Recall (Val) | Recall (Test) | F1-score (Val) | F1-score (Test) |
 |--------------------|----------------|----------------|-------------|--------------|----------------|----------------|
 | Logistic Regression | 0.56           | 0.56           | 0.58        | 0.58         | 0.57           | 0.57           |
@@ -126,13 +141,17 @@ Table 2: Precision, Recall, and F1-score for validation and test sets across mod
 - DNN performs reasonably but slightly lower than XGBoost.  
 
 **Visualizations included:**
-- Confusion matrices for the validation set (comparison of 3 models) (a. Logistic Regression, b. XGBoost, c. DNN)
+
+**Figure 5.1**: Confusion matrices for the validation set (comparison of 3 models) (a. Logistic Regression, b. XGBoost, c. DNN)
+
 <img width="900" height="306" alt="image" src="https://github.com/user-attachments/assets/4e39a0c8-df39-4c0b-8ba6-dfa325343731" />
 
-- Confusion matrices for the test set (comparison of 3 models) (a. Logistic Regression, b. XGBoost, c. DNN)
+**Figure 5.2**: Confusion matrices for the test set (comparison of 3 models) (a. Logistic Regression, b. XGBoost, c. DNN)
+
 <img width="900" height="309" alt="image" src="https://github.com/user-attachments/assets/5765e77d-70ef-4b92-aa87-863646b77557" />
 
-- ROC curves
+**Figure 5.3**: ROC curves
+
   <img width="914" height="656" alt="image" src="https://github.com/user-attachments/assets/8e52f04b-6d9a-4227-afc4-38cec311189c" />
 
 ---
