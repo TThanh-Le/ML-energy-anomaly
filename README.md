@@ -106,5 +106,3 @@ DNN performs better than Logistic Regression but not as well as XGBoost. Its ROC
 
 Overall, considering the validation set results, XGBoost is the best-performing model, offering a good balance between precision and recall, suitable for tasks requiring accurate classification and anomaly detection.
 
-## 7. Repository Structure
-
