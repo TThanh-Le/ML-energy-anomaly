@@ -90,7 +90,7 @@ Key characteristics:
 > This model serves as a baseline for anomaly detection, leveraging the sigmoid function to map feature combinations into probabilistic predictions.
 
 
-###4.2. XGBoost Classifier
+### 4.2. XGBoost Classifier
 
 Key characteristics:
 - Builds an ensemble of **decision trees**, where each new tree corrects the errors of previous ones.
@@ -104,7 +104,7 @@ Key characteristics:
 
 > XGBoost serves as the **best-performing model** in this project, effectively detecting anomalies in building energy consumption by leveraging an ensemble of boosted decision trees.
 
-###4.3. Dense Neural Network (DNN)
+### 4.3. Dense Neural Network (DNN)
 
 Multi-layer feedforward network capturing complex feature interactions.
 
@@ -112,9 +112,12 @@ Architecture: 5 hidden layers with Dropout and L2 regularization.
 
 Early stopping: 10 epochs patience
 
-<img width="916" height="184" alt="image" src="https://github.com/user-attachments/assets/e2b76fac-adfc-47a1-966f-887f503ce5f4" />
-
-**Figure 4.1: Network architecture used in the DNN model for anomaly detection**
+<p align="center">
+  <img width="916" height="184" alt="image" src="https://github.com/user-attachments/assets/e2b76fac-adfc-47a1-966f-887f503ce5f4" />
+  <br>
+  <em>Figure 4.1 - Network architecture used in the DNN model for anomaly detection
+</em>
+</p>
 
 
 ## 5. Evaluation & Results
@@ -141,17 +144,24 @@ Table 5.2: Precision, Recall, and F1-score for validation and test sets across m
 
 **Visualizations included:**
 
-**Figure 5.1**: Confusion matrices for the validation set (comparison of 3 models) (a. Logistic Regression, b. XGBoost, c. DNN)
+<p align="center">
+  <img width="900" height="306" alt="image" src="https://github.com/user-attachments/assets/4e39a0c8-df39-4c0b-8ba6-dfa325343731"/>
+  <br>
+  <em>
+    Figure 5.1 - Confusion matrices for the validation set (comparison of 3 models) (a. Logistic Regression, b. XGBoost, c. DNN)
+</p>
+    
+<p align="center">
+  <img width="900" height="309" alt="image" src="https://github.com/user-attachments/assets/5765e77d-70ef-4b92-aa87-863646b77557"/>
+  <br>
+  <em>Figure 5.2 - Confusion matrices for the test set (comparison of 3 models) (a. Logistic Regression, b. XGBoost, c. DNN)
+</p>
 
-<img width="900" height="306" alt="image" src="https://github.com/user-attachments/assets/4e39a0c8-df39-4c0b-8ba6-dfa325343731" />
-
-**Figure 5.2**: Confusion matrices for the test set (comparison of 3 models) (a. Logistic Regression, b. XGBoost, c. DNN)
-
-<img width="900" height="309" alt="image" src="https://github.com/user-attachments/assets/5765e77d-70ef-4b92-aa87-863646b77557" />
-
-**Figure 5.3**: ROC curves
-
-  <img width="914" height="656" alt="image" src="https://github.com/user-attachments/assets/8e52f04b-6d9a-4227-afc4-38cec311189c" />
+<p align="center">
+  <img width="914" height="656" alt="image" src="https://github.com/user-attachments/assets/8e52f04b-6d9a-4227-afc4-38cec311189c"/>
+  <br>
+  <small><em>Figure 5.3 — ROC curves</em></small>
+</p>
 
 ---
 
