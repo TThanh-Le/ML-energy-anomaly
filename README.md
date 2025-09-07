@@ -75,7 +75,6 @@ The dataset is split into three subsets: training set (70%), validation set (27%
 
 I implemented three complementary models to detect anomalies in building energy consumption:
 
-4.1. Logistic Regression
 ### 4.1 Logistic Regression
 
 Key characteristics:
