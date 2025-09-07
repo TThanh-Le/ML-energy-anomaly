@@ -90,7 +90,7 @@ Key characteristics:
 > This model serves as a baseline for anomaly detection, leveraging the sigmoid function to map feature combinations into probabilistic predictions.
 
 
-4.2. XGBoost Classifier
+###4.2. XGBoost Classifier
 
 Key characteristics:
 - Builds an ensemble of **decision trees**, where each new tree corrects the errors of previous ones.
@@ -104,7 +104,7 @@ Key characteristics:
 
 > XGBoost serves as the **best-performing model** in this project, effectively detecting anomalies in building energy consumption by leveraging an ensemble of boosted decision trees.
 
-4.3. Dense Neural Network (DNN)
+###4.3. Dense Neural Network (DNN)
 
 Multi-layer feedforward network capturing complex feature interactions.
 
