@@ -5,7 +5,6 @@ This project focuses on detecting abnormal energy consumption patterns in commer
 ---
 
 ## 1. Project Overview
-- Buildings account for approximately one-third of global energy consumption, with ~20% wasted due to inefficiencies (equipment malfunctions, misconfigurations, aging systems, human errors).  
 - Detecting anomalies in energy consumption can help optimize energy usage and reduce waste.  
 - This project emphasizes **large-scale data preprocessing, feature engineering, and machine learning modeling** for anomaly detection.
 
